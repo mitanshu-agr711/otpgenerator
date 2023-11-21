@@ -71,12 +71,13 @@ const emailService = {
         pass: 'Xt7KAAxF5VfKsy6wjh'
       }
     });
+    const otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 
     const mailOptions = {
       from: 'noemi.kuvalis@ethereal.email',
       to: email,
       subject: 'Email Verification',
-      text: 'Please verify your email to complete the registration process.' + otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false }),
+      html: `<p>Hello, please verify your email to complete the registration process.</p><p>Your OTP is: ${otp}</p>`,
     };
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
