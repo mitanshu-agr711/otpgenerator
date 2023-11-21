@@ -1,7 +1,9 @@
 const User = require('../models/User');
 const errorHandler = require('../utils/errorHandler');
 const emailService = require('../services/emailService');
+const otpGenerator = require('otp-generator');
 
+const otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 const authController = {
   register: async (req, res) => {
     try {
@@ -23,6 +25,22 @@ const authController = {
       errorHandler(res, error);
     }
   },
+
+  verifyotp:async (req, res) => {
+    try{
+      const{otp}=req.body;
+      console.log(req.body);
+      const verify=await User.findOne({otp});
+      if(verify)
+      {
+        return res.status(200).json({message:"your otp successfully verified"});
+      }
+
+    }catch(error) {
+      errorHandler(res, error);
+    }
+  },
+
 
   login: async (req, res) => {
     try {
