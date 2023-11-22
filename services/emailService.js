@@ -64,17 +64,17 @@ const emailService = {
   sendVerificationEmail: async (email) => {
     console.log('Sending verification email..');
     const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
+      host: 'smtp.gmail.com',
       port: 587,
       auth: {
-        user: 'noemi.kuvalis@ethereal.email',
-        pass: 'Xt7KAAxF5VfKsy6wjh'
+        user: 'mitanshuagrawal5@gmail.com',
+        pass: 'bmvgvzycgbdbkerj'
       }
     });
     const otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
-
+console.log(email);
     const mailOptions = {
-      from: 'noemi.kuvalis@ethereal.email',
+      from: 'mitanshuagrawal5@gmail.com',
       to: email,
       subject: 'Email Verification',
       html: `<p>Hello, please verify your email to complete the registration process.</p><p>Your OTP is: ${otp}</p>`,

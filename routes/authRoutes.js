@@ -10,5 +10,6 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 
 
+router.post('/verifyotp', authController.verifyotp);
 
 module.exports = router;

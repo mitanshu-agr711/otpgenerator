@@ -16,9 +16,10 @@ const authController = {
       }
 
      
-      const newUser = await User.create({ email, password });
+      const newUser = await User.create({ email, password, otp });
 
-      emailService.sendVerificationEmail(newUser.email);
+
+      emailService.sendVerificationEmail(newUser.email, otp);
 
       res.status(201).json({ message: 'User registered successfully. Check your email for verification.' });
     } catch (error) {
@@ -42,7 +43,7 @@ const authController = {
   },
 
 
-  login: async (req, res) => {
+  login: async (req, res) =>  {
     try {
       const { email, password } = req.body;
 
