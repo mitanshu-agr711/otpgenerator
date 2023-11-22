@@ -2,8 +2,8 @@ const User = require('../models/User');
 const errorHandler = require('../utils/errorHandler');
 const emailService = require('../services/emailService');
 const otpGenerator = require('otp-generator');
+const mongoose = require('mongoose');
 
-const otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 const authController = {
   register: async (req, res) => {
     try {
@@ -15,7 +15,7 @@ const authController = {
         return res.status(400).json({ message: 'Email is already registered' });
       }
 
-     
+
       const newUser = await User.create({ email, password, otp });
 
 
@@ -27,23 +27,36 @@ const authController = {
     }
   },
 
-  verifyotp:async (req, res) => {
-    try{
-      const{otp}=req.body;
-      console.log(req.body);
-      const verify=await User.findOne({otp});
-      if(verify)
-      {
-        return res.status(200).json({message:"your otp successfully verified"});
+  verifyotp: async (req, res) => {
+    try {
+      const { otp } = req.body;
+      console.log("Received OTP:", otp);
+
+
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
       }
 
-    }catch(error) {
+      console.log("User's Stored OTP:", user.otp);
+      console.log(user.otp, otp);
+
+      if (user.otp == otp) {
+
+        user.isVerified = true;
+        await user.save();
+
+        return res.status(200).json({ message: "Your OTP is successfully verified" });
+      } else {
+        return res.status(401).json({ message: "Invalid OTP" });
+      }
+    } catch (error) {
       errorHandler(res, error);
     }
   },
 
 
-  login: async (req, res) =>  {
+  login: async (req, res) => {
     try {
       const { email, password } = req.body;
 
