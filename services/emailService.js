@@ -61,7 +61,7 @@ const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 
 const emailService = {
-  sendVerificationEmail: async (email) => {
+  sendVerificationEmail: async (email, otp) => {
     console.log('Sending verification email..');
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -71,14 +71,16 @@ const emailService = {
         pass: 'bmvgvzycgbdbkerj'
       }
     });
-    const otp=otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
-console.log(email);
+    
+    console.log(email, otp);
+
     const mailOptions = {
       from: 'mitanshuagrawal5@gmail.com',
       to: email,
       subject: 'Email Verification',
       html: `<p>Hello, please verify your email to complete the registration process.</p><p>Your OTP is: ${otp}</p>`,
     };
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending verification email:', error);

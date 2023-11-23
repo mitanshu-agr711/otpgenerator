@@ -8,17 +8,20 @@ const authController = {
   register: async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log(req.body);
 
+     
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: 'Email is already registered' });
       }
 
+      
+      const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
 
+     
       const newUser = await User.create({ email, password, otp });
 
-
+     
       emailService.sendVerificationEmail(newUser.email, otp);
 
       res.status(201).json({ message: 'User registered successfully. Check your email for verification.' });
@@ -29,20 +32,19 @@ const authController = {
 
   verifyotp: async (req, res) => {
     try {
-      const { otp } = req.body;
-      console.log("Received OTP:", otp);
+      const { otp, email } = req.body;
 
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
 
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(401).json({ message: "User not found" });
       }
 
-      console.log("User's Stored OTP:", user.otp);
-      console.log(user.otp, otp);
-
-      if (user.otp == otp) {
-
+      if (user.otp === otp) {
         user.isVerified = true;
         await user.save();
 
@@ -54,7 +56,6 @@ const authController = {
       errorHandler(res, error);
     }
   },
-
 
   login: async (req, res) => {
     try {
@@ -68,6 +69,7 @@ const authController = {
       if (!user.isVerified) {
         return res.status(401).json({ message: 'Email not verified. Please check your email for verification instructions.' });
       }
+
       const token = generateToken(user);
       res.status(200).json({ token, message: 'Login successful' });
     } catch (error) {
