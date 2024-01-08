@@ -41,6 +41,17 @@ userSchema.pre('save', async function (next) {
   }
 });
 
+userSchema.pre('save', async function (next) {
+  try {
+    if (this.isModified('newpassword')) {
+      const salt = await bcrypt.genSalt(10);
+      this.newpassword = await bcrypt.hash(this.newpassword, salt);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 userSchema.methods.comparePassword = async function (password) {
   try {
     return await bcrypt.compare(password, this.password);
@@ -49,17 +60,8 @@ userSchema.methods.comparePassword = async function (password) {
   }
 };
 
-userSchema.pre('save', async function (next) {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.newpassword = await bcrypt.hash(this.newpassword, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
-userSchema.methods.comparePassword = async function (newpassword) {
+userSchema.methods.compareNewPassword = async function (newpassword) {
   try {
     return await bcrypt.compare(newpassword, this.newpassword);
   } catch (error) {
