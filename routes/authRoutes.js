@@ -12,4 +12,9 @@ router.post('/login', authController.login);
 
 router.post('/verifyotp', authController.verifyotp);
 
+router.post('/forgetpassword',authController.forgetpassword);
+
+
+router.post('/updatepassword',authController.updatepassword);
+
 module.exports = router;

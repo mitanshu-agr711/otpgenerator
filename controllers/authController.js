@@ -76,6 +76,44 @@ const authController = {
       errorHandler(res, error);
     }
   },
+  forgetpassword:async(req,res)=>{
+    try{
+      const{email}=req.body;
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      emailService. sendPasswordResetEmail(email);
+      res.status(201).json({ message: 'Check your email for forget password.' });
+    }
+    catch(error){
+      errorHandler(res, error);
+    }
+  },
+  updatepassword:async(req,res)=>{
+    try{
+      const{email,newpassword}=req.body;
+      if (!email || !newpassword) {
+        return res.status(400).json({ message: 'Email and new password are required' });
+      }
+  
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      user.password=newpassword;
+      await user.save();
+
+      res.status(200).json({ message: 'Password updated successfully.' });
+    }
+    catch(error){
+      errorHandler(res, error);
+    }
+  }
 
 };
 
