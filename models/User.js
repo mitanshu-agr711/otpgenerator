@@ -25,10 +25,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  newpassword:{
+  resetToken: {
     type: String,
     required: true,
-  }
+  },
+  newpassword:{
+    type: String,
+    required:true,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -63,6 +67,10 @@ userSchema.methods.comparePassword = async function (password) {
 
 userSchema.methods.compareNewPassword = async function (newpassword) {
   try {
+    if (!this.newpassword) {
+      // Handle the case where newpassword is not set
+      return false;
+    }
     return await bcrypt.compare(newpassword, this.newpassword);
   } catch (error) {
     throw error;

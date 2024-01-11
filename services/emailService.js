@@ -1,6 +1,6 @@
 // const emailjs = require('@emailjs/nodejs');
 const otpGenerator = require('otp-generator');
-
+// const authController=require('authController');
 const nodemailer = require('nodemailer');
 
 const emailService = {
@@ -35,7 +35,7 @@ const emailService = {
   },
 
 
-  sendPasswordResetEmail: async (email) => {
+  sendPasswordResetEmail: async (email,resetToken) => {
     console.log('Sending verification email..');
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -49,14 +49,14 @@ const emailService = {
       from: 'mitanshuagrawal5@gmail.com',
       to: email,
       subject: 'password reset',
-      html: `<p>Hello, please reset your password to complete the registration process.`,
+      html: `<p>Hello, please reset your password to complete the registration process.token link is ${resetToken}`,
     };
 
     transporter.sendMail(mailOptionspassword, (error, info) => {
       if (error) {
         console.error('Error sending verification email:', error);
       } else {
-        console.log('Verification email sent:', mailOptions);
+        console.log('Verification email sent:', mailOptions);  
         console.log('Verification email sent:', info.response);
       }
     });

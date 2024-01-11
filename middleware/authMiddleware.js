@@ -11,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, 'mits');
+    const decoded = jwt.verify(token, 'mihts');
 
 
     req.user = await User.findById(decoded.id);
@@ -28,3 +28,7 @@ const authMiddleware = async (req, res, next) => {
 
 module.exports = authMiddleware;
 
+
+
+
+// what is middleware use this 
