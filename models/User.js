@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+
   },
   password: {
     type: String,
@@ -25,57 +26,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  resetToken: {
-    type: String,
-    required: true,
-  },
   newpassword:{
     type: String,
-    required:true,
+    required: false,
   },
 });
 
-userSchema.pre('save', async function (next) {
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
 
-userSchema.pre('save', async function (next) {
-  try {
-    if (this.isModified('newpassword')) {
-      const salt = await bcrypt.genSalt(10);
-      this.newpassword = await bcrypt.hash(this.newpassword, salt);
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-userSchema.methods.comparePassword = async function (password) {
-  try {
-    return await bcrypt.compare(password, this.password);
-  } catch (error) {
-    throw error;
-  }
-};
-
-
-userSchema.methods.compareNewPassword = async function (newpassword) {
-  try {
-    if (!this.newpassword) {
-      // Handle the case where newpassword is not set
-      return false;
-    }
-    return await bcrypt.compare(newpassword, this.newpassword);
-  } catch (error) {
-    throw error;
-  }
-};
 
 const User = mongoose.model('User', userSchema);
 

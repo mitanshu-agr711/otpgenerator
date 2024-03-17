@@ -4,6 +4,7 @@ const User = require('../models/User');
 const errorHandler = require('../utils/errorHandler');
 
 const authMiddleware = async (req, res, next) => {
+  console.log(req)
   const token = req.header('Authorization');
 
   if (!token) {
@@ -11,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, 'mihts');
+    const decoded = jwt.verify(token, 'mitanshu');
 
 
     req.user = await User.findById(decoded.id);
