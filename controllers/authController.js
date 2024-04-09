@@ -34,7 +34,7 @@ const authController = {
     }
   },
 
-  verifyotp: async (req, res) => {
+  verifyotp:  async (req, res) => {
     try {
       const { otp, email } = req.body;
 
@@ -70,7 +70,7 @@ const authController = {
       return res.status(401).json({ message: 'User not verified. Please check your email for verification instructions.' });
     }
 
-
+ 
       if (!user) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
