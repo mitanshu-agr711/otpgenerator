@@ -6,60 +6,81 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const secretKey = 'Mitanshu';
 const bcrypt = require('bcrypt');
-
+const tempStorage = new Map();
 const authController = {
-  register: async (req, res) => {
-    try {
-      const { email, password } = req.body;
+register: async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ message: 'Email is already registered' });
-      }
-
-
-      const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await User.create({ email, password:hashedPassword, otp });
-
-
-      emailService.sendVerificationEmail(newUser.email, otp);
-
-      res.status(201).json({ message: 'User registered successfully. Check your email for verification.' });
-    } catch (error) {
-      errorHandler(res, error);
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already registered' });
     }
-  },
 
-  verifyotp:  async (req, res) => {
-    try {
-      const { otp, email } = req.body;
+    
+    const otp = otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
 
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      if (!email) {
-        return res.status(400).json({ message: 'Email is required' });
-      }
+ 
+    tempStorage.set(email, { hashedPassword, otp, createdAt: Date.now() });
 
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(401).json({ message: "User not found" });
-      }
+  
+    emailService.sendVerificationEmail(email, otp);
 
-      if (user.otp === otp) {
-        user.isVerified = true;
-        await user.save();
+    res.status(201).json({
+      message: 'OTP sent to your email. Please verify to complete registration.'
+    });
+  } catch (error) {
+    errorHandler(res, error);
+  }
+},
 
-        return res.status(200).json({ message: "Your OTP is successfully verified" });
-      } else {
-        return res.status(401).json({ message: "Invalid OTP" });
-      }
-    } catch (error) {
-      errorHandler(res, error);
+verifyotp: async (req, res) => {
+  try {
+    const { otp, email } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
     }
-  },
+
+   
+    const tempData = tempStorage.get(email);
+
+    if (!tempData) {
+      return res.status(400).json({ message: 'No registration data found. Please register again.' });
+    }
+
+    const { hashedPassword, otp: storedOtp, createdAt } = tempData;
+
+ 
+    if (storedOtp !== otp) {
+      return res.status(401).json({ message: 'Invalid OTP' });
+    }
+
+   
+    const otpExpiry = 10 * 60 * 1000; 
+    if (Date.now() - createdAt > otpExpiry) {
+      tempStorage.delete(email);
+      return res.status(400).json({ message: 'OTP has expired. Please register again.' });
+    }
+
+  
+    const newUser = await User.create({
+      email,
+      password: hashedPassword,
+      isVerified: true
+    });
+
+  
+    tempStorage.delete(email);
+
+    res.status(200).json({ message: 'OTP verified successfully. Registration complete.' });
+  } catch (error) {
+    errorHandler(res, error);
+  }
+},
 
   login: async (req, res) => {
     try {
