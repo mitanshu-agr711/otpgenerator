@@ -35,7 +35,7 @@ app.use('/auth', authRoutes);
 app.get('/', (req, res) => {
   res.send('Welcome to your Node.js authentication app!');
 });
-
+console.log("hebhbhiub");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

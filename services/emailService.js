@@ -33,34 +33,6 @@ const emailService = {
       }
     });
   },
-
-
-  sendPasswordResetEmail: async (email,resetToken) => {
-    console.log('Sending verification email..');
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      auth: {
-        user: 'mitanshuagrawal5@gmail.com',
-        pass: 'bmvgvzycgbdbkerj'
-      }
-    });
-    const mailOptionspassword = {
-      from: 'mitanshuagrawal5@gmail.com',
-      to: email,
-      subject: 'password reset',
-      html: `<p>Hello, please reset your password to complete the registration process.token link is ${resetToken}`,
-    };
-
-    transporter.sendMail(mailOptionspassword, (error, info) => {
-      if (error) {
-        console.error('Error sending verification email:', error);
-      } else {
-        console.log('Verification email sent:', mailOptions);  
-        console.log('Verification email sent:', info.response);
-      }
-    });
-  }
 } ;
 
 module.exports = emailService;
