@@ -2,16 +2,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-
+const status=require('express-status-monitor')
 dotenv.config();
-
+const fs = require('fs');
 
 const app = express();
 
 
 app.use(express.json());
 
-
+app.use(status());
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -33,7 +33,14 @@ app.use('/auth', authRoutes);
 
 
 app.get('/', (req, res) => {
-  res.send('Welcome to your Node.js authentication app!');
+  const stream = fs.createReadStream("./static.txt", "utf-8");//for memory optimization
+  stream.on("data", (chunk) => {
+    res.write(chunk);
+  });
+  stream.on("end", () => {
+    res.end();
+    console.log("File reading completed.");
+  });
 });
 console.log("hebhbhiub");
 
