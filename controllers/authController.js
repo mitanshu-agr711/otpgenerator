@@ -40,7 +40,7 @@ register: async (req, res) => {
 verifyotp: async (req, res) => {
   try {
     const { otp, email } = req.body;
-    console.log("otp",otp);
+    // console.log("otp",otp);
     if (!email || !otp) {
       return res.status(400).json({ message: 'Email and OTP are required' });
     }
